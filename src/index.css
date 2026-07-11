@@ -63,3 +63,19 @@ body::before {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(229, 193, 88, 0.25); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(229, 193, 88, 0.45); }
+
+/* Touch-friendly base: ensure all interactive elements have minimum 44px tap targets on mobile */
+@media (pointer: coarse) {
+  button, a, select, input, textarea {
+    min-height: 44px;
+  }
+}
+
+/* Responsive typography */
+@media (max-width: 768px) {
+  html { font-size: 15px; }
+}
+
+@media (max-width: 480px) {
+  html { font-size: 14px; }
+}

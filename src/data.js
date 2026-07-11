@@ -1,8 +1,9 @@
 export const agents = [
-  { id: 1, name: "Sarah Jenkins", avatar: "SJ", color: "#d4af37" },
-  { id: 2, name: "Michael Chang", avatar: "MC", color: "#e5c158" },
-  { id: 3, name: "Emily Rodriguez", avatar: "ER", color: "#f0d476" },
-  { id: 4, name: "David Kim", avatar: "DK", color: "#c9a52a" },
+  { id: 1, name: "Mahadev Dhanuk", avatar: "MD", color: "#d4af37" },
+  { id: 2, name: "Sajjan Sharma", avatar: "SS", color: "#e5c158" },
+  { id: 3, name: "Laxman Sanjyal", avatar: "LS", color: "#f0d476" },
+  { id: 4, name: "Babbu Yadhav", avatar: "BY", color: "#c9a52a" },
+  { id: 5, name: "Nilam Acharya", avatar: "NA", color: "#b8941e" },
 ];
 
 export const listings = [

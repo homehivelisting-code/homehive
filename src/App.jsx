@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { Plus, LayoutGrid, Table, LogOut, Search } from 'lucide-react';
+import { Plus, LayoutGrid, Table, LogOut, Search, Menu, X } from 'lucide-react';
 import { agents, listings as initialListings } from './data';
 import MetricsCards from './components/MetricsCards';
 import ListingsTable from './components/ListingsTable';
@@ -63,6 +63,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({ beds: '', aspect: '', status: '', priceRange: '', propertyType: '', listedBy: '', listingStyle: '' });
   const [sortConfig, setSortConfig] = useState({ key: 'address', direction: 'asc' });
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Modal states
   const [showAddEdit, setShowAddEdit] = useState(false);
@@ -226,25 +227,81 @@ function App() {
               className={`view-toggle-btn ${viewMode === 'table' ? 'active' : ''}`}
               onClick={() => setViewMode('table')}
             >
-              <Table size={16} /> Table
+              <Table size={16} /> <span className="view-toggle-label">Table</span>
             </button>
             <button
               className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
               onClick={() => setViewMode('grid')}
             >
-              <LayoutGrid size={16} /> Grid
+              <LayoutGrid size={16} /> <span className="view-toggle-label">Grid</span>
             </button>
           </div>
           <button className="btn btn-primary" onClick={openAddModal}>
             <Plus size={16} />
-            Add Property
+            <span className="btn-label-desktop">Add Property</span>
+            <span className="btn-label-mobile">Add</span>
           </button>
           <button className="btn btn-ghost btn-sm" onClick={handleSignOut}>
             <LogOut size={14} />
-            Sign Out
+            <span className="btn-label-desktop">Sign Out</span>
+          </button>
+          <button
+            className="hamburger-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </header>
+
+      {/* Mobile menu overlay */}
+      {mobileMenuOpen && (
+        <div className="mobile-menu-overlay" onClick={() => setMobileMenuOpen(false)}>
+          <div className="mobile-menu glass-panel" onClick={(e) => e.stopPropagation()}>
+            <div className="mobile-menu-header">
+              <div className="header-agent">
+                <div
+                  className="header-agent-avatar"
+                  style={{ background: `linear-gradient(135deg, ${currentAgent.color}, ${currentAgent.color}dd)` }}
+                >
+                  {currentAgent.avatar}
+                </div>
+                <span className="header-agent-name">{currentAgent.name}</span>
+              </div>
+            </div>
+            <div className="mobile-menu-search">
+              <Search size={16} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+              <input
+                type="text"
+                placeholder="Search properties..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <div className="mobile-menu-actions">
+              <button
+                className={`mobile-menu-btn ${viewMode === 'table' ? 'active' : ''}`}
+                onClick={() => { setViewMode('table'); setMobileMenuOpen(false); }}
+              >
+                <Table size={16} /> Table View
+              </button>
+              <button
+                className={`mobile-menu-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                onClick={() => { setViewMode('grid'); setMobileMenuOpen(false); }}
+              >
+                <LayoutGrid size={16} /> Grid View
+              </button>
+              <button className="mobile-menu-btn primary" onClick={() => { openAddModal(); setMobileMenuOpen(false); }}>
+                <Plus size={16} /> Add Property
+              </button>
+              <button className="mobile-menu-btn danger" onClick={handleSignOut}>
+                <LogOut size={16} /> Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="tab-bar">

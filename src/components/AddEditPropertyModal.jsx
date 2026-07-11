@@ -5,7 +5,7 @@ const CATEGORIES = ['Sale', 'Lease'];
 const TYPES = ['House', 'Unit', 'Apartment'];
 const ASPECTS = ['North', 'South', 'East', 'West'];
 const STATUSES = ['Available', 'Hold', 'Sold'];
-const AGENTS = ['Sarah Jenkins', 'Michael Chang', 'Emily Rodriguez', 'David Kim'];
+const AGENTS = ['Mahadev Dhanuk', 'Sajjan Sharma', 'Laxman Sanjyal', 'Babbu Yadhav', 'Nilam Acharya'];
 const LISTING_STYLES = ['Off-Market', 'Exclusive'];
 
 const emptyForm = {
@@ -22,7 +22,7 @@ const emptyForm = {
   aspect: 'North',
   price: 0,
   status: 'Available',
-  listedBy: 'Sarah Jenkins',
+  listedBy: 'Mahadev Dhanuk',
   notes: '',
   links: [],
   listingStyle: 'Exclusive',

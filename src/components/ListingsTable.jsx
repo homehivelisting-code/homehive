@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Edit3, Trash2, ExternalLink } from 'lucide-react';
+import { Edit3, Trash2, ExternalLink, Filter, X } from 'lucide-react';
 
 const statusConfig = {
   Available: { label: 'Available', color: '#22c55e', bg: 'rgba(34,197,94,0.15)' },
@@ -22,6 +22,7 @@ export default function ListingsTable({
   onFilterChange,
 }) {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const handleSort = (key) => {
     setSortConfig((prev) => ({
@@ -98,7 +99,15 @@ export default function ListingsTable({
   return (
     <div className="glass-panel table-container">
       <div className="table-toolbar">
-        <div className="table-filters">
+        <button
+          className="filter-toggle-btn"
+          onClick={() => setFiltersOpen(!filtersOpen)}
+          aria-label="Toggle filters"
+        >
+          {filtersOpen ? <X size={14} /> : <Filter size={14} />}
+          <span>Filters</span>
+        </button>
+        <div className={`table-filters ${filtersOpen ? 'open' : ''}`}>
           <select
             className="filter-select"
             value={filters.status || ''}
@@ -125,10 +134,11 @@ export default function ListingsTable({
             onChange={(e) => onFilterChange?.('listedBy', e.target.value)}
           >
             <option value="">All Agents</option>
-            <option value="Sarah Jenkins">Sarah Jenkins</option>
-            <option value="Michael Chang">Michael Chang</option>
-            <option value="Emily Rodriguez">Emily Rodriguez</option>
-            <option value="David Kim">David Kim</option>
+            <option value="Mahadev Dhanuk">Mahadev Dhanuk</option>
+            <option value="Sajjan Sharma">Sajjan Sharma</option>
+            <option value="Laxman Sanjyal">Laxman Sanjyal</option>
+            <option value="Babbu Yadhav">Babbu Yadhav</option>
+            <option value="Nilam Acharya">Nilam Acharya</option>
           </select>
           <select
             className="filter-select"
