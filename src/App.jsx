@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Plus, LayoutGrid, Table, LogOut, Search, Menu, X } from 'lucide-react';
-import { agents, listings as initialListings } from './data';
+import { agents, fetchListings, addListing, updateListing, deleteListing } from './data';
 import MetricsCards from './components/MetricsCards';
 import ListingsTable from './components/ListingsTable';
 import ListingsGrid from './components/ListingsGrid';
@@ -51,13 +51,10 @@ function LoginScreen({ onSelectAgent }) {
 }
 
 function App() {
-  // Session state
   const [currentAgent, setCurrentAgent] = useState(() => loadState('currentAgent', null));
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Persisted state
-  const [listings, setListings] = useState(() => loadState('hh_listings', initialListings));
-
-  // UI state
   const [viewMode, setViewMode] = useState('table');
   const [activeTab, setActiveTab] = useState('Sale');
   const [searchQuery, setSearchQuery] = useState('');
@@ -65,18 +62,20 @@ function App() {
   const [sortConfig, setSortConfig] = useState({ key: 'address', direction: 'asc' });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Modal states
   const [showAddEdit, setShowAddEdit] = useState(false);
   const [editingListing, setEditingListing] = useState(null);
   const [showColourScheme, setShowColourScheme] = useState(false);
   const [colourSchemeListing, setColourSchemeListing] = useState(null);
 
-  // Persist to localStorage
   useEffect(() => {
-    localStorage.setItem('hh_listings', JSON.stringify(listings));
-  }, [listings]);
+    async function load() {
+      const data = await fetchListings();
+      setListings(data);
+      setLoading(false);
+    }
+    load();
+  }, []);
 
-  // Session handlers
   const handleSelectAgent = useCallback((agent) => {
     localStorage.setItem('currentAgent', JSON.stringify(agent));
     setCurrentAgent(agent);
@@ -87,7 +86,6 @@ function App() {
     setCurrentAgent(null);
   }, []);
 
-  // Sorting
   const handleSort = useCallback((key) => {
     setSortConfig((prev) => ({
       key,
@@ -95,12 +93,10 @@ function App() {
     }));
   }, []);
 
-  // Tab-filtered listings
   const tabListings = useMemo(() => {
     return listings.filter((l) => l.category === activeTab);
   }, [listings, activeTab]);
 
-  // Filter + Sort
   const filteredListings = useMemo(() => {
     let result = [...tabListings];
 
@@ -142,25 +138,32 @@ function App() {
     return result;
   }, [tabListings, searchQuery, filters, sortConfig]);
 
-  // Handlers
   const handleFilterChange = useCallback((key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   }, []);
 
-  const handleStatusChange = useCallback((id, newStatus) => {
+  const handleStatusChange = useCallback(async (id, newStatus) => {
     setListings((prev) => prev.map((l) => (l.id === id ? { ...l, status: newStatus } : l)));
+    await updateListing(id, { status: newStatus });
   }, []);
 
-  const handlePriceChange = useCallback((id, newPrice) => {
+  const handlePriceChange = useCallback(async (id, newPrice) => {
     setListings((prev) => prev.map((l) => (l.id === id ? { ...l, price: newPrice } : l)));
+    await updateListing(id, { price: newPrice });
   }, []);
 
-  const handleAddEditSave = useCallback((formData) => {
+  const handleAddEditSave = useCallback(async (formData) => {
     if (editingListing) {
-      setListings((prev) => prev.map((l) => (l.id === editingListing.id ? { ...l, ...formData } : l)));
+      const updated = await updateListing(editingListing.id, formData);
+      if (updated) {
+        setListings((prev) => prev.map((l) => (l.id === editingListing.id ? updated : l)));
+      }
     } else {
-      const newId = Math.max(0, ...listings.map((l) => l.id)) + 1;
-      setListings((prev) => [...prev, { ...formData, id: newId }]);
+      const maxId = listings.length > 0 ? Math.max(...listings.map((l) => l.id)) : 0;
+      const newListing = await addListing({ ...formData, id: maxId + 1 });
+      if (newListing) {
+        setListings((prev) => [...prev, newListing]);
+      }
     }
     setEditingListing(null);
   }, [editingListing, listings]);
@@ -170,10 +173,13 @@ function App() {
     setShowAddEdit(true);
   }, []);
 
-  const handleDelete = useCallback((id) => {
+  const handleDelete = useCallback(async (id) => {
     const listing = listings.find((l) => l.id === id);
     if (listing && window.confirm(`Delete ${listing.address}?`)) {
-      setListings((prev) => prev.filter((l) => l.id !== id));
+      const success = await deleteListing(id);
+      if (success) {
+        setListings((prev) => prev.filter((l) => l.id !== id));
+      }
     }
   }, [listings]);
 
@@ -187,14 +193,26 @@ function App() {
     setShowAddEdit(true);
   }, []);
 
-  // Not logged in — show login screen
   if (!currentAgent) {
     return <LoginScreen onSelectAgent={handleSelectAgent} />;
   }
 
+  if (loading) {
+    return (
+      <div className="login-screen">
+        <div className="login-container">
+          <div className="login-brand">
+            <img src="/logo.png" alt="HomeHive" className="login-logo" />
+            <h1 className="login-title">HomeHive</h1>
+            <p className="login-subtitle">Loading listings...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app-container">
-      {/* Header */}
       <header className="app-header">
         <div className="header-brand">
           <img src="/logo.png" alt="HomeHive" className="header-logo" />
@@ -255,7 +273,6 @@ function App() {
         </div>
       </header>
 
-      {/* Mobile menu overlay */}
       {mobileMenuOpen && (
         <div className="mobile-menu-overlay" onClick={() => setMobileMenuOpen(false)}>
           <div className="mobile-menu glass-panel" onClick={(e) => e.stopPropagation()}>
@@ -303,7 +320,6 @@ function App() {
         </div>
       )}
 
-      {/* Tabs */}
       <div className="tab-bar">
         <button
           className={`tab-btn ${activeTab === 'Sale' ? 'active' : ''}`}
@@ -325,10 +341,8 @@ function App() {
         </button>
       </div>
 
-      {/* Metrics */}
       <MetricsCards listings={listings} category={activeTab} />
 
-      {/* Listings View */}
       {viewMode === 'table' ? (
         <ListingsTable
           listings={filteredListings}
@@ -349,7 +363,6 @@ function App() {
         />
       )}
 
-      {/* Modals */}
       <AddEditPropertyModal
         show={showAddEdit}
         onClose={() => { setShowAddEdit(false); setEditingListing(null); }}
