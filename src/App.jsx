@@ -317,6 +317,12 @@ function App() {
         >
           For Lease
         </button>
+        <button
+          className={`tab-btn ${activeTab === 'Development' ? 'active' : ''}`}
+          onClick={() => setActiveTab('Development')}
+        >
+          For Development
+        </button>
       </div>
 
       {/* Metrics */}
@@ -330,6 +336,7 @@ function App() {
           onDelete={handleDelete}
           filters={filters}
           onFilterChange={handleFilterChange}
+          category={activeTab}
         />
       ) : (
         <ListingsGrid

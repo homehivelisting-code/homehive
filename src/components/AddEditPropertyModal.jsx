@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { X, Save, Plus, Trash2 } from 'lucide-react';
 
-const CATEGORIES = ['Sale', 'Lease'];
+const CATEGORIES = ['Sale', 'Lease', 'Development'];
 const TYPES = ['House', 'Unit', 'Apartment'];
 const ASPECTS = ['North', 'South', 'East', 'West'];
-const STATUSES = ['Available', 'Hold', 'Sold'];
+const STATUSES = ['Available', 'Hold', 'Sold', 'Under Contract'];
 const AGENTS = ['Mahadev Dhanuk', 'Sajjan Sharma', 'Laxman Sanjyal', 'Babbu Yadhav', 'Nilam Acharya'];
 const LISTING_STYLES = ['Off-Market', 'Exclusive'];
 
@@ -18,6 +18,7 @@ const emptyForm = {
   livingSize: 0,
   landSize: 0,
   houseArea: 0,
+  houseSize: 0,
   aspect: 'North',
   price: '',
   status: 'Available',
@@ -25,6 +26,12 @@ const emptyForm = {
   notes: '',
   links: [],
   listingStyle: 'Exclusive',
+  suburb: '',
+  estate: '',
+  loanAgreementRequired: false,
+  estimatedCompletionDate: '',
+  rentalYield: '',
+  brochure: '',
 };
 
 const numberFields = ['beds', 'baths', 'cars', 'livingSize', 'landSize', 'houseArea'];
@@ -99,6 +106,7 @@ export default function AddEditPropertyModal({ show, onClose, onSave, editingLis
   if (!show) return null;
 
   const isLease = form.category === 'Lease';
+  const isDevelopment = form.category === 'Development';
   const isHouse = form.type === 'House';
   const isEditing = !!editingListing;
 
@@ -140,7 +148,7 @@ export default function AddEditPropertyModal({ show, onClose, onSave, editingLis
                 >
                   {CATEGORIES.map((c) => (
                     <option key={c} value={c}>
-                      {c === 'Lease' ? 'For Lease' : 'For Sale'}
+                      {c === 'Lease' ? 'For Lease' : c === 'Development' ? 'For Development' : 'For Sale'}
                     </option>
                   ))}
                 </select>
@@ -338,6 +346,90 @@ export default function AddEditPropertyModal({ show, onClose, onSave, editingLis
                   ))}
                 </select>
               </div>
+
+              {/* ---- Section: Development Details ---- */}
+              {isDevelopment && (
+                <>
+                  <div className="form-section">Development Details</div>
+
+                  <div className="form-group">
+                    <label className="form-label">Suburb</label>
+                    <input
+                      className="form-input"
+                      type="text"
+                      value={form.suburb || ''}
+                      onChange={(e) => handleChange('suburb', e.target.value)}
+                      placeholder="e.g. WOLLERT"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Estate</label>
+                    <input
+                      className="form-input"
+                      type="text"
+                      value={form.estate || ''}
+                      onChange={(e) => handleChange('estate', e.target.value)}
+                      placeholder="e.g. LYNDARUM NORTH"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Estimated Completion Date</label>
+                    <input
+                      className="form-input"
+                      type="text"
+                      value={form.estimatedCompletionDate || ''}
+                      onChange={(e) => handleChange('estimatedCompletionDate', e.target.value)}
+                      placeholder="e.g. qtr 4 - 26"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">House Size (SQ)</label>
+                    <input
+                      className="form-input"
+                      type="number"
+                      min="0"
+                      value={form.houseSize ?? ''}
+                      onChange={(e) => handleChange('houseSize', e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Rental Yield</label>
+                    <input
+                      className="form-input"
+                      type="text"
+                      value={form.rentalYield || ''}
+                      onChange={(e) => handleChange('rentalYield', e.target.value)}
+                      placeholder="e.g. 4.45%"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Brochure</label>
+                    <input
+                      className="form-input"
+                      type="text"
+                      value={form.brochure || ''}
+                      onChange={(e) => handleChange('brochure', e.target.value)}
+                      placeholder="e.g. FLYER"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input
+                        type="checkbox"
+                        checked={form.loanAgreementRequired || false}
+                        onChange={(e) => handleChange('loanAgreementRequired', e.target.checked)}
+                      />
+                      Loan Agreement Required
+                    </label>
+                  </div>
+                </>
+              )}
 
               {/* ---- Section: Additional ---- */}
               <div className="form-section">Additional Details</div>

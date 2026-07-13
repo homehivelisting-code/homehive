@@ -13,6 +13,7 @@ const statusConfig = {
 const categoryConfig = {
   Sale: { class: 'category-sale', color: '#3b82f6' },
   Lease: { class: 'category-lease', color: '#8b5cf6' },
+  Development: { class: 'category-development', color: '#f97316' },
 };
 
 const typeConfig = {
