@@ -163,24 +163,25 @@ export default function ListingsTable({
               <>
                 <tr>
                   <th rowSpan={2} style={{ width: '50px', verticalAlign: 'middle' }}>S/N</th>
-                  <th rowSpan={2} style={{ verticalAlign: 'middle', minWidth: '200px' }}>Address</th>
-                  <th rowSpan={2} style={{ verticalAlign: 'middle' }}>Suburb</th>
+                  <th rowSpan={2} style={{ verticalAlign: 'middle', minWidth: '220px' }}>Address</th>
+                  <th rowSpan={2} style={{ verticalAlign: 'middle' }}>SUBURB</th>
                   <th rowSpan={2} style={{ verticalAlign: 'middle' }}>Estate</th>
-                  <th rowSpan={2} style={{ verticalAlign: 'middle' }}>Est. Completion</th>
-                  <th colSpan={5} style={{ textAlign: 'center', borderBottom: '1px solid var(--accent-gold)' }}>Property Details</th>
                   <th rowSpan={2} style={{ verticalAlign: 'middle' }}>Loan Agreement</th>
+                  <th rowSpan={2} style={{ verticalAlign: 'middle' }}>Est. Completion</th>
+                  <th colSpan={2} style={{ textAlign: 'center', borderBottom: '1px solid var(--accent-gold)' }}>Size</th>
+                  <th colSpan={3} style={{ textAlign: 'center', borderBottom: '1px solid var(--accent-gold)' }}>Rooms</th>
                   <th rowSpan={2} style={{ verticalAlign: 'middle' }}>Price</th>
-                  <th rowSpan={2} style={{ verticalAlign: 'middle' }}>Yield</th>
-                  <th rowSpan={2} style={{ verticalAlign: 'middle' }}>Status</th>
-                  <th rowSpan={2} style={{ verticalAlign: 'middle' }}>Brochure</th>
+                  <th rowSpan={2} style={{ verticalAlign: 'middle' }}>Rental Yield</th>
+                  <th rowSpan={2} style={{ verticalAlign: 'middle' }}>STATUS</th>
+                  <th rowSpan={2} style={{ verticalAlign: 'middle' }}>BROCHURE</th>
                   <th rowSpan={2} style={{ verticalAlign: 'middle', width: '100px' }}>Actions</th>
                 </tr>
                 <tr>
-                  <SortHeader label="House Size" sortKey="houseSize" />
-                  <SortHeader label="Beds" sortKey="beds" />
-                  <SortHeader label="Baths" sortKey="baths" />
-                  <SortHeader label="Cars" sortKey="cars" />
                   <SortHeader label="Land Size" sortKey="landSize" />
+                  <SortHeader label="House Size (SQ)" sortKey="houseSize" />
+                  <SortHeader label="Bed" sortKey="beds" />
+                  <SortHeader label="Bath" sortKey="baths" />
+                  <SortHeader label="Car" sortKey="cars" />
                 </tr>
               </>
             ) : (
@@ -230,17 +231,19 @@ export default function ListingsTable({
                     </td>
                     <td>{listing.suburb || '-'}</td>
                     <td>{listing.estate || '-'}</td>
+                    <td style={{ fontWeight: 600, fontSize: '0.74rem', color: listing.loanAgreementRequired ? 'var(--accent-green)' : 'var(--text-muted)' }}>
+                      {listing.loanAgreementRequired ? 'YES' : 'NO'}
+                    </td>
                     <td style={{ fontSize: '0.74rem' }}>{listing.estimatedCompletionDate || '-'}</td>
+                    <td>{listing.landSize ? `${listing.landSize}` : '-'}</td>
                     <td>{listing.houseSize ?? '-'}</td>
                     <td>{listing.beds ?? '-'}</td>
                     <td>{listing.baths ?? '-'}</td>
                     <td>{listing.cars ?? '-'}</td>
-                    <td>{listing.landSize ? formatSize(listing.landSize) : '-'}</td>
-                    <td>{listing.loanAgreementRequired ? 'YES' : 'NO'}</td>
                     <td className="price-cell">
                       {formatPrice(listing.price, listing.category)}
                     </td>
-                    <td style={{ fontSize: '0.74rem', color: 'var(--accent-green)' }}>{listing.rentalYield || '-'}</td>
+                    <td style={{ fontSize: '0.74rem', color: 'var(--accent-green)', fontWeight: 600 }}>{listing.rentalYield || '-'}</td>
                     <td>
                       <span
                         className="status-badge"
@@ -259,7 +262,21 @@ export default function ListingsTable({
                         {statusCfg.label}
                       </span>
                     </td>
-                    <td style={{ fontSize: '0.74rem' }}>{listing.brochure || '-'}</td>
+                    <td>
+                      <span style={{
+                        display: 'inline-block',
+                        padding: '2px 10px',
+                        borderRadius: '12px',
+                        fontSize: '0.72rem',
+                        fontWeight: 600,
+                        color: '#f59e0b',
+                        backgroundColor: 'rgba(245,158,11,0.15)',
+                        border: '1px solid rgba(245,158,11,0.33)',
+                        whiteSpace: 'nowrap',
+                      }}>
+                        {listing.brochure || '-'}
+                      </span>
+                    </td>
                     <td>
                       <div className="action-btns">
                         <button className="action-btn" onClick={() => onEdit?.(listing)}>
