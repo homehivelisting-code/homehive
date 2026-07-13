@@ -66,11 +66,12 @@ export default function ListingsTable({
   });
 
   const formatPrice = (price, listingType) => {
-    if (price == null) return '-';
+    if (price == null || price === '') return '-';
+    const formatted = typeof price === 'number' ? price.toLocaleString() : price;
     if (listingType === 'Lease') {
-      return `$${price.toLocaleString()}/wk`;
+      return `$${formatted}/wk`;
     }
-    return `$${price.toLocaleString()}`;
+    return `$${formatted}`;
   };
 
   const formatSize = (val) => {

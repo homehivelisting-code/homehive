@@ -27,10 +27,12 @@ const listingStyleConfig = {
 };
 
 function formatPrice(price, category) {
+  if (price == null || price === '') return '-';
+  const formatted = typeof price === 'number' ? price.toLocaleString() : price;
   if (category === 'Lease') {
-    return `$${price.toLocaleString()}/wk`;
+    return `$${formatted}/wk`;
   }
-  return `$${price.toLocaleString()}`;
+  return `$${formatted}`;
 }
 
 function NotesSection({ notes }) {

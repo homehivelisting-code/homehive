@@ -10,17 +10,16 @@ const LISTING_STYLES = ['Off-Market', 'Exclusive'];
 
 const emptyForm = {
   category: 'Sale',
-  title: '',
   address: '',
   type: 'House',
-  beds: 2,
-  baths: 2,
-  cars: 1,
-  livingSize: 80,
-  landSize: null,
-  houseArea: 80,
+  beds: 0,
+  baths: 0,
+  cars: 0,
+  livingSize: 0,
+  landSize: 0,
+  houseArea: 0,
   aspect: 'North',
-  price: 0,
+  price: '',
   status: 'Available',
   listedBy: 'Mahadev Dhanuk',
   notes: '',
@@ -28,7 +27,7 @@ const emptyForm = {
   listingStyle: 'Exclusive',
 };
 
-const numberFields = ['beds', 'baths', 'cars', 'livingSize', 'landSize', 'houseArea', 'price'];
+const numberFields = ['beds', 'baths', 'cars', 'livingSize', 'landSize', 'houseArea'];
 
 export default function AddEditPropertyModal({ show, onClose, onSave, editingListing }) {
   const [form, setForm] = useState(emptyForm);
@@ -75,8 +74,9 @@ export default function AddEditPropertyModal({ show, onClose, onSave, editingLis
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
-      if (!form.category || !form.title || !form.address || !form.type || !form.price) return;
-      onSave(form);
+      if (!form.category || !form.address || !form.type) return;
+      const autoTitle = form.address.split(',')[0].trim() || form.address;
+      onSave({ ...form, title: autoTitle });
       onClose();
     },
     [form, onSave, onClose]
@@ -275,21 +275,6 @@ export default function AddEditPropertyModal({ show, onClose, onSave, editingLis
               {/* ---- Section: Listing Info ---- */}
               <div className="form-section">Listing Information</div>
 
-              {/* Full-width: Title */}
-              <div className="form-group full-width">
-                <label className="form-label">
-                  Title <span className="required">*</span>
-                </label>
-                <input
-                  className="form-input"
-                  type="text"
-                  value={form.title}
-                  onChange={(e) => handleChange('title', e.target.value)}
-                  placeholder="e.g. The Meridian, Harbour Heights"
-                  required
-                />
-              </div>
-
               {/* Full-width: Address */}
               <div className="form-group full-width">
                 <label className="form-label">
@@ -314,13 +299,10 @@ export default function AddEditPropertyModal({ show, onClose, onSave, editingLis
                   <span className="price-prefix">$</span>
                   <input
                     className="form-input price-field"
-                    type="number"
-                    min="0"
-                    step={isLease ? '10' : '5000'}
+                    type="text"
                     value={form.price ?? ''}
                     onChange={(e) => handleChange('price', e.target.value)}
-                    placeholder={isLease ? 'e.g. 750' : 'e.g. 2350000'}
-                    required
+                    placeholder={isLease ? 'e.g. 750/wk' : 'e.g. 700-800k, 1.2M, 2350000'}
                   />
                   {isLease && <span className="price-suffix">/wk</span>}
                 </div>
