@@ -34,6 +34,8 @@ const mapRowToListing = (row) => ({
   estimatedCompletionDate: row.estimated_completion_date,
   rentalYield: row.rental_yield,
   brochure: row.brochure,
+  createdAt: row.created_at,
+  updatedAt: row.updated_at,
 });
 
 const mapListingToRow = (listing) => ({
@@ -98,7 +100,7 @@ export async function updateListing(id, updates) {
   const row = mapListingToRow({ ...updates, id });
   const { data, error } = await supabase
     .from('listings')
-    .update(row)
+    .update({ ...row, updated_at: new Date().toISOString() })
     .eq('id', id)
     .select()
     .single();
@@ -123,6 +125,33 @@ export async function deleteListing(id) {
   }
 
   return true;
+}
+
+export function getListingBadges(listing) {
+  const badges = [];
+  const HOURS_NEW = 72; // Show "Brand New" for 72 hours
+  const HOURS_UPDATED = 48; // Show "Updated" for 48 hours
+
+  const now = new Date();
+  const createdAt = listing.createdAt ? new Date(listing.createdAt) : null;
+  const updatedAt = listing.updatedAt ? new Date(listing.updatedAt) : null;
+
+  if (createdAt) {
+    const hoursSinceCreated = (now - createdAt) / (1000 * 60 * 60);
+    if (hoursSinceCreated < HOURS_NEW) {
+      badges.push({ label: 'Brand New', type: 'new' });
+    }
+  }
+
+  if (updatedAt && createdAt) {
+    const hoursSinceUpdated = (now - updatedAt) / (1000 * 60 * 60);
+    const wasActuallyUpdated = (updatedAt - createdAt) > 60 * 1000; // > 1 min diff
+    if (wasActuallyUpdated && hoursSinceUpdated < HOURS_UPDATED) {
+      badges.push({ label: 'Updated', type: 'updated' });
+    }
+  }
+
+  return badges;
 }
 
 export const colourSchemes = [

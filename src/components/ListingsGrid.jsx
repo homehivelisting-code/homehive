@@ -1,8 +1,10 @@
 import { useState, useMemo } from 'react';
 import {
   Bed, Bath, Car, Maximize, MapPin, Home, User, FileText,
-  Compass, Edit3, Trash2, ChevronDown, ChevronUp, ExternalLink
+  Compass, Edit3, Trash2, ChevronDown, ChevronUp, ExternalLink,
+  Sparkles, RefreshCw
 } from 'lucide-react';
+import { getListingBadges } from '../data';
 
 const statusConfig = {
   Available: { class: 'status-available', color: '#34d399' },
@@ -102,6 +104,8 @@ export default function ListingsGrid({ listings, searchQuery = '', onEdit, onDel
         const type = typeConfig[listing.type] || typeConfig.Apartment;
         const listingStyle = listingStyleConfig[listing.listingStyle] || listingStyleConfig.Exclusive;
 
+        const badges = getListingBadges(listing);
+
         return (
           <div
             key={listing.id}
@@ -115,6 +119,24 @@ export default function ListingsGrid({ listings, searchQuery = '', onEdit, onDel
               <span className={`status-badge ${status.class}`}>
                 {listing.status}
               </span>
+              {badges.map((badge, i) => (
+                <span
+                  key={i}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '3px',
+                    padding: '1px 7px', borderRadius: '10px',
+                    fontSize: '0.6rem', fontWeight: 700, whiteSpace: 'nowrap',
+                    color: badge.type === 'new' ? '#22c55e' : '#3b82f6',
+                    backgroundColor: badge.type === 'new' ? 'rgba(34,197,94,0.12)' : 'rgba(59,130,246,0.12)',
+                    border: `1px solid ${badge.type === 'new' ? 'rgba(34,197,94,0.25)' : 'rgba(59,130,246,0.25)'}`,
+                    letterSpacing: '0.3px',
+                    marginLeft: 'auto',
+                  }}
+                >
+                  {badge.type === 'new' ? <Sparkles size={9} /> : <RefreshCw size={9} />}
+                  {badge.label}
+                </span>
+              ))}
             </div>
 
             {/* Title */}

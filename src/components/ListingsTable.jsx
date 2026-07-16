@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Edit3, Trash2, ExternalLink, Filter, X } from 'lucide-react';
+import { Edit3, Trash2, ExternalLink, Filter, X, Sparkles, RefreshCw } from 'lucide-react';
+import { getListingBadges } from '../data';
 
 const statusConfig = {
   Available: { label: 'Available', color: '#22c55e', bg: 'rgba(34,197,94,0.15)' },
@@ -222,12 +223,33 @@ export default function ListingsTable({
               const statusCfg = statusConfig[listing.status] || statusConfig.Available;
               const styleCfg = listing.listingStyle ? listingStyleConfig[listing.listingStyle] : null;
 
+              const badges = getListingBadges(listing);
+
               if (category === 'Development') {
                 return (
                   <tr key={listing.id || index}>
                     <td className="sn-cell">{index + 1}</td>
                     <td className="address-cell" title={listing.address}>
-                      {listing.address || '-'}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                        <span>{listing.address || '-'}</span>
+                        {badges.map((badge, i) => (
+                          <span
+                            key={i}
+                            style={{
+                              display: 'inline-flex', alignItems: 'center', gap: '3px',
+                              padding: '1px 7px', borderRadius: '10px',
+                              fontSize: '0.62rem', fontWeight: 700, whiteSpace: 'nowrap',
+                              color: badge.type === 'new' ? '#22c55e' : '#3b82f6',
+                              backgroundColor: badge.type === 'new' ? 'rgba(34,197,94,0.12)' : 'rgba(59,130,246,0.12)',
+                              border: `1px solid ${badge.type === 'new' ? 'rgba(34,197,94,0.25)' : 'rgba(59,130,246,0.25)'}`,
+                              letterSpacing: '0.3px',
+                            }}
+                          >
+                            {badge.type === 'new' ? <Sparkles size={9} /> : <RefreshCw size={9} />}
+                            {badge.label}
+                          </span>
+                        ))}
+                      </div>
                     </td>
                     <td>{listing.suburb || '-'}</td>
                     <td>{listing.estate || '-'}</td>
@@ -305,7 +327,26 @@ export default function ListingsTable({
                   <td className="sn-cell">{index + 1}</td>
 
                   <td className="address-cell" title={listing.address}>
-                    {listing.address || '-'}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                      <span>{listing.address || '-'}</span>
+                      {badges.map((badge, i) => (
+                        <span
+                          key={i}
+                          style={{
+                            display: 'inline-flex', alignItems: 'center', gap: '3px',
+                            padding: '1px 7px', borderRadius: '10px',
+                            fontSize: '0.62rem', fontWeight: 700, whiteSpace: 'nowrap',
+                            color: badge.type === 'new' ? '#22c55e' : '#3b82f6',
+                            backgroundColor: badge.type === 'new' ? 'rgba(34,197,94,0.12)' : 'rgba(59,130,246,0.12)',
+                            border: `1px solid ${badge.type === 'new' ? 'rgba(34,197,94,0.25)' : 'rgba(59,130,246,0.25)'}`,
+                            letterSpacing: '0.3px',
+                          }}
+                        >
+                          {badge.type === 'new' ? <Sparkles size={9} /> : <RefreshCw size={9} />}
+                          {badge.label}
+                        </span>
+                      ))}
+                    </div>
                   </td>
 
                   <td className="type-cell">{listing.type || '-'}</td>
