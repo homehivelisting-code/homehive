@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { Plus, LayoutGrid, Table, LogOut, Search, Menu, X } from 'lucide-react';
+import { Plus, LayoutGrid, Table, LogOut, Search, Menu, X, Lock } from 'lucide-react';
 import { agents, fetchListings, addListing, updateListing, deleteListing } from './data';
 import MetricsCards from './components/MetricsCards';
 import ListingsTable from './components/ListingsTable';
@@ -16,6 +16,115 @@ function loadState(key, fallback) {
   } catch {
     return fallback;
   }
+}
+
+const APP_PASSWORD = '5555';
+
+function PasswordGate({ onCorrect }) {
+  const [value, setValue] = useState('');
+  const [error, setError] = useState(false);
+
+  const handleDigit = (d) => {
+    if (value.length >= 4) return;
+    const next = value + d;
+    setValue(next);
+    setError(false);
+    if (next.length === 4) {
+      if (next === APP_PASSWORD) {
+        setTimeout(() => onCorrect(), 200);
+      } else {
+        setError(true);
+        setTimeout(() => setValue(''), 600);
+      }
+    }
+  };
+
+  const handleBackspace = () => {
+    setValue((prev) => prev.slice(0, -1));
+    setError(false);
+  };
+
+  return (
+    <div className="login-screen">
+      <div className="login-container" style={{ maxWidth: '380px' }}>
+        <div className="login-brand">
+          <img src="/logo.png" alt="HomeHive" className="login-logo" />
+          <h1 className="login-title">HomeHive</h1>
+          <p className="login-subtitle">Collaborative Property Management Dashboard</p>
+        </div>
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <div style={{
+            width: 48, height: 48, borderRadius: '50%',
+            background: 'linear-gradient(135deg, var(--accent-gold), #f0d476)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 16px',
+          }}>
+            <Lock size={22} style={{ color: '#1a1a2e' }} />
+          </div>
+          <h2 className="login-prompt" style={{ marginBottom: 8 }}>Enter Passcode</h2>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>4-digit code required to access the dashboard</p>
+        </div>
+        <div style={{
+          display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: 24,
+        }}>
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} style={{
+              width: 48, height: 58, borderRadius: 8,
+              background: error ? 'rgba(239,68,68,0.15)' : 'rgba(255,255,255,0.06)',
+              border: `2px solid ${error ? '#ef4444' : 'rgba(255,255,255,0.1)'}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '1.4rem', fontWeight: 700, color: '#fff',
+              transition: 'all 0.15s ease',
+            }}>
+              {value[i] ? '●' : ''}
+            </div>
+          ))}
+        </div>
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px',
+          maxWidth: 240, margin: '0 auto',
+        }}>
+          {[1,2,3,4,5,6,7,8,9].map((d) => (
+            <button key={d} onClick={() => handleDigit(String(d))} style={{
+              height: 52, borderRadius: 10, border: 'none',
+              background: 'rgba(255,255,255,0.08)', color: '#fff',
+              fontSize: '1.3rem', fontWeight: 600, cursor: 'pointer',
+              transition: 'background 0.15s',
+            }}
+              onMouseEnter={(e) => e.target.style.background = 'rgba(255,255,255,0.15)'}
+              onMouseLeave={(e) => e.target.style.background = 'rgba(255,255,255,0.08)'}
+            >
+              {d}
+            </button>
+          ))}
+          <button onClick={handleBackspace} style={{
+            height: 52, borderRadius: 10, border: 'none',
+            backgroundColor: 'transparent', color: 'var(--text-muted)',
+            fontSize: '0.85rem', cursor: 'pointer',
+          }}>
+            ⌫
+          </button>
+          <button onClick={() => handleDigit('0')} style={{
+            height: 52, borderRadius: 10, border: 'none',
+            background: 'rgba(255,255,255,0.08)', color: '#fff',
+            fontSize: '1.3rem', fontWeight: 600, cursor: 'pointer',
+            transition: 'background 0.15s',
+          }}
+            onMouseEnter={(e) => e.target.style.background = 'rgba(255,255,255,0.15)'}
+            onMouseLeave={(e) => e.target.style.background = 'rgba(255,255,255,0.08)'}
+          >
+            0
+          </button>
+          <div />
+        </div>
+        {error && (
+          <p style={{ textAlign: 'center', color: '#ef4444', fontSize: '0.8rem', marginTop: 16 }}>
+            Incorrect passcode
+          </p>
+        )}
+      </div>
+    </div>
+  );
 }
 
 function LoginScreen({ onSelectAgent }) {
@@ -51,6 +160,7 @@ function LoginScreen({ onSelectAgent }) {
 }
 
 function App() {
+  const [passwordEntered, setPasswordEntered] = useState(() => loadState('passwordEntered', false));
   const [currentAgent, setCurrentAgent] = useState(() => loadState('currentAgent', null));
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -76,6 +186,11 @@ function App() {
     load();
   }, []);
 
+  const handlePasswordCorrect = useCallback(() => {
+    localStorage.setItem('passwordEntered', JSON.stringify(true));
+    setPasswordEntered(true);
+  }, []);
+
   const handleSelectAgent = useCallback((agent) => {
     localStorage.setItem('currentAgent', JSON.stringify(agent));
     setCurrentAgent(agent);
@@ -83,7 +198,9 @@ function App() {
 
   const handleSignOut = useCallback(() => {
     localStorage.removeItem('currentAgent');
+    localStorage.removeItem('passwordEntered');
     setCurrentAgent(null);
+    setPasswordEntered(false);
   }, []);
 
   const handleSort = useCallback((key) => {
@@ -192,6 +309,10 @@ function App() {
     setEditingListing(null);
     setShowAddEdit(true);
   }, []);
+
+  if (!passwordEntered) {
+    return <PasswordGate onCorrect={handlePasswordCorrect} />;
+  }
 
   if (!currentAgent) {
     return <LoginScreen onSelectAgent={handleSelectAgent} />;
