@@ -32,6 +32,8 @@ const emptyForm = {
   estimatedCompletionDate: '',
   rentalYield: '',
   brochure: '',
+  isNew: false,
+  isUpdated: false,
 };
 
 const numberFields = ['beds', 'baths', 'cars', 'livingSize', 'landSize', 'houseArea'];
@@ -444,6 +446,30 @@ export default function AddEditPropertyModal({ show, onClose, onSave, editingLis
                   onChange={(e) => handleChange('notes', e.target.value)}
                   placeholder="Optional notes about this property..."
                 />
+              </div>
+
+              {/* Badge Toggles */}
+              <div className="form-group">
+                <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={form.isNew || false}
+                    onChange={(e) => handleChange('isNew', e.target.checked)}
+                    style={{ accentColor: '#22c55e', width: 16, height: 16 }}
+                  />
+                  <span style={{ color: '#22c55e', fontWeight: 700, fontSize: '0.78rem' }}>✨ Brand New</span>
+                </label>
+              </div>
+              <div className="form-group">
+                <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={form.isUpdated || false}
+                    onChange={(e) => handleChange('isUpdated', e.target.checked)}
+                    style={{ accentColor: '#3b82f6', width: 16, height: 16 }}
+                  />
+                  <span style={{ color: '#3b82f6', fontWeight: 700, fontSize: '0.78rem' }}>↻ Updated</span>
+                </label>
               </div>
 
               {/* Full-width: Links */}

@@ -34,6 +34,8 @@ const mapRowToListing = (row) => ({
   estimatedCompletionDate: row.estimated_completion_date,
   rentalYield: row.rental_yield,
   brochure: row.brochure,
+  isNew: row.is_new ?? false,
+  isUpdated: row.is_updated ?? false,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
 });
@@ -64,6 +66,8 @@ const mapListingToRow = (listing) => ({
   estimated_completion_date: listing.estimatedCompletionDate,
   rental_yield: listing.rentalYield,
   brochure: listing.brochure,
+  is_new: listing.isNew ?? false,
+  is_updated: listing.isUpdated ?? false,
 });
 
 export async function fetchListings() {
@@ -129,28 +133,8 @@ export async function deleteListing(id) {
 
 export function getListingBadges(listing) {
   const badges = [];
-  const HOURS_NEW = 72; // Show "Brand New" for 72 hours
-  const HOURS_UPDATED = 48; // Show "Updated" for 48 hours
-
-  const now = new Date();
-  const createdAt = listing.createdAt ? new Date(listing.createdAt) : null;
-  const updatedAt = listing.updatedAt ? new Date(listing.updatedAt) : null;
-
-  if (createdAt) {
-    const hoursSinceCreated = (now - createdAt) / (1000 * 60 * 60);
-    if (hoursSinceCreated < HOURS_NEW) {
-      badges.push({ label: 'Brand New', type: 'new' });
-    }
-  }
-
-  if (updatedAt && createdAt) {
-    const hoursSinceUpdated = (now - updatedAt) / (1000 * 60 * 60);
-    const wasActuallyUpdated = (updatedAt - createdAt) > 60 * 1000; // > 1 min diff
-    if (wasActuallyUpdated && hoursSinceUpdated < HOURS_UPDATED) {
-      badges.push({ label: 'Updated', type: 'updated' });
-    }
-  }
-
+  if (listing.isNew) badges.push({ label: 'Brand New', type: 'new' });
+  if (listing.isUpdated) badges.push({ label: 'Updated', type: 'updated' });
   return badges;
 }
 
